@@ -65,6 +65,10 @@ description: 한국어 모션그래픽 영상(이력서용 쇼릴·홍보 영상
 
 Windows에서는 명령의 `python3`을 `python`으로 바꿔 쓴다. 스크립트가 스스로 UTF-8 모드로 실행되므로 `PYTHONUTF8`을 따로 설정하지 않아도 된다.
 
+### 수정을 거듭할 영상
+
+시연·설명 영상처럼 수정 요청이 여러 번 오갈 영상은 컷으로 나눠 `reel.py`로 만든다. 소스를 한 벌만 두고, 시각을 `cuts.json` 한곳에서 관리하고, 바뀐 컷만 다시 렌더하고, 판을 쌓는다. 수정 요청의 영상 시각은 `reel.py where 03:56`으로 컷과 자막을 찾는다. 렌더가 끝난 컷부터 `cache/preview/`에서 소리와 함께 볼 수 있다. 판마다 폴더를 복사하지 않는다. 자세한 절차는 `references/revision.md`에 있다.
+
 ## 0. 환경 점검
 
 ```bash
@@ -261,3 +265,4 @@ python3 $S/qa_check.py <프로젝트>/out/<이름>.mp4 --timeline <프로젝트>
 | `references/engine.md` | 8단계: 엔진 API, 장면 작성법, WebGL·3D, 나눠 만들기 |
 | `references/techniques.md` | 8단계: 검증된 기법 코드 22종과 싱크·첫 프레임·섬광·결정성 규칙 |
 | `references/qa.md` | 9·11단계: 비평, 기술 점검표, 시트 읽는 법, 납품 보고·제작노트 양식 |
+| `references/revision.md` | 수정을 거듭할 영상: 폴더 구조, `cuts.json`, 부분 렌더, 판 저장·복원, 컷 검사 |

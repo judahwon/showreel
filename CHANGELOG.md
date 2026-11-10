@@ -7,12 +7,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- `scripts/reel.py` for videos that go through repeated revisions: one source tree, `cuts.json` as the single source of timing (cues can reference each other and narration length), cut lengths snapped to frames, re-rendering only changed cuts, releases that refuse a video older than its sources, releases stored in a content-addressed store, and `where` to map a video timestamp to its cut, caption, cues and sound effects (`references/revision.md`).
+- `reel.py` shows each cut as soon as it renders: `cache/preview/<cut>_<mode>.mp4` gets the matching slice of the mix, and `reel.py preview` joins the current clips with the mix in seconds. `all` mixes before rendering so these previews have current sound, and leaves the share-size encode and QA to `all --full` or `release`, which runs them when they are missing or older than the master.
+- `scripts/cut_checks.py`: candidates for bright or dark frames at cut boundaries, sound effects with no screen change, emphasis cues away from their caption, and captions that need a line break.
+- `scripts/record_deps.mjs`: records which assets each cut actually loads.
+- `scripts/test_reel.py`: tests for timing, change detection, releases and the checks.
 - Windows support: scripts rerun themselves in UTF-8 mode (`scripts/_utf8.py`), `preflight.py` finds Chrome and fonts on Windows and gives Windows install hints, `new_project.py` finds Windows fonts and `npm.cmd`, and `render.mjs` handles Windows paths.
 
 ### Fixed
 
 - `contact_sheet.py` failed on ffmpeg 8, which removed `-vsync`.
 - `qa_check.py` no longer hides a contact sheet failure.
+- `reel.py render` no longer rewrites the asset list of cuts it did not render, which made those cuts look changed and re-render on the next run.
+- `reel.py render <cut> --adopt` adopted every cut instead of the named ones.
 
 ### Changed
 
