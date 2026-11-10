@@ -7,6 +7,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- `version.py` versions standard-flow projects (`release`, `list`, `show`, `diff`, `restore`).
+  - Each `out/versions/vN/` holds the deliverables (master, share, poster, srt, moved there from `out/` so they are not kept twice), a `src/` folder with only the small recipe files needed to rebuild that cut (scene code, `script.json`, timeline, music spec, data, docs), a `manifest.json`, and a `변경.md` that summarizes changes since the previous version.
+  - Heavy files shared across versions (images, fonts, engine, music, sfx, narration, `mix.wav`) are stored once in `shared/` under content-hashed names, so editing a file never overwrites what an older version used.
+  - Files are included only if the page actually loads them: `version_deps.mjs` seeks through the page the same way the renderer does, and audio comes from `timeline.json`. Unused takes, raw research and drafts are left out.
+  - `release` refuses when the deliverable is older than its inputs, or when `mix.wav` is older than its audio inputs.
+  - Documented in `references/versions.md` and as step 12 in `SKILL.md`.
+
 - `scripts/reel.py` for videos that go through repeated revisions: one source tree, `cuts.json` as the single source of timing (cues can reference each other and narration length), cut lengths snapped to frames, re-rendering only changed cuts, releases that refuse a video older than its sources, releases stored in a content-addressed store, and `where` to map a video timestamp to its cut, caption, cues and sound effects (`references/revision.md`).
 - `reel.py` shows each cut as soon as it renders: `cache/preview/<cut>_<mode>.mp4` gets the matching slice of the mix, and `reel.py preview` joins the current clips with the mix in seconds. `all` mixes before rendering so these previews have current sound, and leaves the share-size encode and QA to `all --full` or `release`, which runs them when they are missing or older than the master.
 - `scripts/cut_checks.py`: candidates for bright or dark frames at cut boundaries, sound effects with no screen change, emphasis cues away from their caption, and captions that need a line break.
