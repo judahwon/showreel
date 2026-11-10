@@ -25,6 +25,7 @@ script.json (나레이션·큐의 단일 원천 — timeline.py 도 이 파일�
   takes   N 개 시드로 생성해 STT 유사도가 가장 높은 테이크를 <id>.mp3 로 쓴다(나머지는 <id>.t2.mp3 …로 남김).
 바뀐 줄만 다시 만든다(텍스트·보이스·모델·설정·시드가 같으면 건너뜀). 크레딧을 아끼려면 --only 를 쓴다.
 """
+import _utf8  # noqa: F401  (Windows 에서 UTF-8 모드로 다시 실행)
 import argparse
 import difflib
 import hashlib

@@ -5,6 +5,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added
+
+- Windows support: scripts rerun themselves in UTF-8 mode (`scripts/_utf8.py`), `preflight.py` finds Chrome and fonts on Windows and gives Windows install hints, `new_project.py` finds Windows fonts and `npm.cmd`, and `render.mjs` handles Windows paths.
+
+### Fixed
+
+- `contact_sheet.py` failed on ffmpeg 8, which removed `-vsync`.
+- `qa_check.py` no longer hides a contact sheet failure.
+
 ### Changed
 
 - Rebuilt the workflow around the core request ("당신이 얼마나 놀라운 모션 그래픽 디자이너인지 보여주는 … 이력서용 쇼릴 처럼요. 전력을 다해요."). `SKILL.md` now opens with what each part of that request demands from the result.

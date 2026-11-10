@@ -17,6 +17,7 @@
 
 종료 코드: 0 성공 · 2 키 없음 · 3 키 무효/권한 부족 · 4 유료 플랜 필요 · 5 요청 오류 · 6 네트워크
 """
+import _utf8  # noqa: F401  (Windows 에서 UTF-8 모드로 다시 실행)
 import argparse
 import base64
 import json
@@ -54,7 +55,7 @@ def api_key():
         return k.strip()
     for envf in (Path.cwd() / ".env", Path.cwd().parent / ".env", Path.home() / ".config/showreel/.env"):
         if envf.exists():
-            for line in envf.read_text().splitlines():
+            for line in envf.read_text(encoding="utf-8").splitlines():
                 if line.strip().startswith("ELEVENLABS_API_KEY="):
                     return line.split("=", 1)[1].strip().strip('"').strip("'")
     return None
@@ -154,7 +155,7 @@ def tts(text, out, voice=DEFAULT_VOICE, model=DEFAULT_MODEL, settings=None, seed
             raise ElevenError("오디오가 비어 있다", 5)
         Path(out).write_bytes(audio)
         al = d.get("alignment") or d.get("normalized_alignment") or {}   # normalized_alignment 는 한국어를 로마자로 준다 → alignment 우선
-        Path(out).with_suffix(".align.json").write_text(json.dumps(al, ensure_ascii=False))
+        Path(out).with_suffix(".align.json").write_text(json.dumps(al, ensure_ascii=False), encoding="utf-8")
         return al
     Path(out).write_bytes(raw)
     return None
@@ -283,14 +284,14 @@ def cmd_tts(a):
 def cmd_stt(a):
     d = stt(a.file, lang=a.lang)
     if a.json:
-        Path(a.json).write_text(json.dumps(d, ensure_ascii=False, indent=1))
+        Path(a.json).write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
     print(d.get("text", ""))
     return 0
 
 
 def load_presets(path=None):
     p = Path(path) if path else SKILL / "assets" / "sfx_presets.json"
-    return {x["name"]: x for x in json.loads(p.read_text())}
+    return {x["name"]: x for x in json.loads(p.read_text(encoding="utf-8"))}
 
 
 def cmd_sfx(a):
@@ -334,7 +335,7 @@ def cmd_sfx_kit(a):
 
 
 def cmd_music(a):
-    plan = json.loads(Path(a.plan).read_text()) if a.plan else None
+    plan = json.loads(Path(a.plan).read_text(encoding="utf-8")) if a.plan else None
     if plan and "composition_plan" in plan:
         model = plan.get("model_id", a.model)
         plan = plan["composition_plan"]

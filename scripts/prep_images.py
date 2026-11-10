@@ -12,6 +12,7 @@
   - --cutout: macOS 에서 Vision 으로 인물·피사체 누끼 PNG(<이름>_cut.png). 처음 한 번 Swift 로 컴파일한다(약 20초)
 실존 인물 사진은 생성하지 말고 실제 사진(출처 기록)만 쓴다. 누끼는 원본 픽셀을 바꾸지 않는다(배경만 투명).
 """
+import _utf8  # noqa: F401  (Windows 에서 UTF-8 모드로 다시 실행)
 import argparse
 import os
 import platform

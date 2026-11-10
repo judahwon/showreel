@@ -13,6 +13,7 @@
 마지막에 ffprobe·ebur128 로 규격을 검증해 표로 보여 준다(yuv420p·tv 범위·프레임 수·LUFS·true peak).
 오디오만 고쳤다면 영상을 다시 렌더하지 말고 이 스크립트만 다시 돌리면 된다.
 """
+import _utf8  # noqa: F401  (Windows 에서 UTF-8 모드로 다시 실행)
 import argparse
 import json
 import re

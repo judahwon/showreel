@@ -23,12 +23,13 @@ import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { once } from 'node:events';
 import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 import crypto from 'node:crypto';
 
 const require = createRequire(import.meta.url);
 let chromium;
 try { ({ chromium } = require('playwright-core')); }
-catch { console.error('playwright-core 가 없다. 한 번만: cd ' + path.dirname(new URL(import.meta.url).pathname) + ' && npm install'); process.exit(1); }
+catch { console.error('playwright-core 가 없다. 한 번만: cd ' + path.dirname(fileURLToPath(import.meta.url)) + ' && npm install'); process.exit(1); }
 
 const argv = process.argv.slice(2);
 const opt = {};
@@ -242,7 +243,7 @@ try {
       await p.ctx.close();
     }));
     const list = path.join(segDir, 'concat.txt');
-    fs.writeFileSync(list, chunks.map(c => `file '${segName(c)}'`).join('\n'));
+    fs.writeFileSync(list, chunks.map(c => `file '${segName(c).split(path.sep).join('/')}'`).join('\n'));
     run('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list, '-c', 'copy', '-movflags', '+faststart', out]);
     const secs = (Date.now() - t0) / 1000;
     console.log(`완료: ${out} (${secs.toFixed(1)}초, ${f1 - f0}프레임 × 서브 ${sub}, ${fps}fps, ${W * scale}x${H * scale}, 워커 ${n || 0})`);

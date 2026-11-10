@@ -12,6 +12,7 @@
 칸이 --per 개를 넘으면 out_01.png, out_02.png … 로 나눠 저장한다.
 ffmpeg 에 drawtext 가 없어도 되도록 라벨은 PIL 로 그린다. 프레임은 select 로 정확한 프레임 번호를 뽑는다.
 """
+import _utf8  # noqa: F401  (Windows 에서 UTF-8 모드로 다시 실행)
 import argparse
 import glob
 import json
@@ -60,7 +61,10 @@ def extract(video, frames, tmp):
         part = frames[i:i + 40]
         expr = "+".join(f"eq(n\\,{f})" for f in part)
         pat = os.path.join(tmp, f"b{i:05d}_%04d.png")
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", video, "-vf", f"select='{expr}'", "-vsync", "vfr", pat], check=True)
+        command = ["ffmpeg", "-v", "error", "-y", "-i", video, "-vf", f"select='{expr}'"]
+        # -vsync 는 ffmpeg 8 에서 없어졌고 -fps_mode 는 5.1 부터 있다
+        if subprocess.run([*command, "-fps_mode", "vfr", pat], capture_output=True).returncode != 0:
+            subprocess.run([*command, "-vsync", "vfr", pat], check=True)
         got = sorted(glob.glob(os.path.join(tmp, f"b{i:05d}_*.png")))
         for f, p in zip(part, got):
             paths[f] = p

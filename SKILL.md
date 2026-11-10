@@ -63,6 +63,8 @@ description: 한국어 모션그래픽 영상(이력서용 쇼릴·홍보 영상
 
 스크립트 경로는 이 스킬 폴더 기준이다(`~/.claude/skills/showreel/scripts/`). 아래에서 `S=~/.claude/skills/showreel/scripts`로 줄여 쓴다.
 
+Windows에서는 명령의 `python3`을 `python`으로 바꿔 쓴다. 스크립트가 스스로 UTF-8 모드로 실행되므로 `PYTHONUTF8`을 따로 설정하지 않아도 된다.
+
 ## 0. 환경 점검
 
 ```bash
