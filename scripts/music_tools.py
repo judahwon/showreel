@@ -20,6 +20,7 @@
   "mood" 는 synth_music.py 대체 경로용으로 남겨 둔다.
 주의: 아티스트·작곡가·곡 이름("Hans Zimmer style" 등)은 저작권 필터에 걸려 400 으로 거부된다. 장르·악기·분위기로만 쓴다.
 """
+import _utf8  # noqa: F401  (Windows 에서 UTF-8 모드로 다시 실행)
 import argparse
 import json
 import subprocess

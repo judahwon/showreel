@@ -17,6 +17,7 @@
   1초 넘는 멈춤은 의도한 정적(음악을 끊은 순간 등)만 남긴다
   (참고: 스킬 없이 만든 같은 요청의 영상 — 15초 2%·p90 53, 30초 12%·p90 8.7, 2분 39%·p90 5.7)
 """
+import _utf8  # noqa: F401  (Windows 에서 UTF-8 모드로 다시 실행)
 import argparse
 import json
 import subprocess

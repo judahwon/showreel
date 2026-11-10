@@ -14,6 +14,7 @@
            한 번 틀린 줄은 STT 의 변덕일 수 있으니 한 번 더 돌려 두 번 다 틀릴 때만 고친다.
   시트     길이에 맞춰 0.5~3초 간격 콘택트 시트(qa/final_sheet*.png)
 """
+import _utf8  # noqa: F401  (Windows 에서 UTF-8 모드로 다시 실행)
 import argparse
 import json
 import re
@@ -175,6 +176,8 @@ def main():
     cs = sh([sys.executable, str(HERE / "contact_sheet.py"), "--video", str(vid), "--every", str(step), "--out", str(qa / "final_sheet.png"),
              "--cols", "6", "--thumb", "320", "--per", "36"] + (["--timeline", a.timeline] if a.timeline else []))
     sheets = [x for x in cs.stdout.split() if x.endswith(".png")]
+    if not sheets:
+        issues.append("콘택트 시트를 만들지 못했다: " + (cs.stderr.strip().splitlines() or ["원인 불명"])[-1][:160])
     rep.append(f"- 콘택트 시트({step}초 간격): " + ", ".join(sheets))
 
     md = [f"# 자동 검수 — {vid.name}", "", *rep, "", "## 고칠 것" if issues else "## 자동 검사 통과", *[f"- [ ] {x}" for x in issues],

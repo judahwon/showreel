@@ -17,6 +17,7 @@
       9dB 이상이면 충분, 6dB 미만(✗)이면 그 줄 근처 효과음을 줄이거나 --duck 을 올리거나 그 줄의 gain_db 를 +2~4.
   --mute music,sfx 로 원인 분리(STT 가 틀리면 음악 탓인지 발음 탓인지 가린다).
 """
+import _utf8  # noqa: F401  (Windows 에서 UTF-8 모드로 다시 실행)
 import argparse
 import json
 import re

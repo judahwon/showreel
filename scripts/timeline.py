@@ -23,6 +23,7 @@
 
 검사: 줄 겹침, 목표 길이 초과, 큐를 못 찾음, 장면 경계 침범 — 문제가 있으면 ✗ 로 표시하고 종료 코드 1.
 """
+import _utf8  # noqa: F401  (Windows 에서 UTF-8 모드로 다시 실행)
 import argparse
 import json
 import re

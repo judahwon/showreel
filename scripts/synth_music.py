@@ -19,6 +19,7 @@ energy(0~1)에 따라 층이 쌓인다 — cinematic: 드론 → 패드(0.15) �
 → 브라스 스탭(0.65) → 8분 타이코·심벌(0.75) → 고음 아르페지오(0.85). stop 은 음악만 잠깐 끊는다(정적 연출).
 컷을 박자에 맞추려면 장면 경계를 60/bpm 의 배수에 두거나, 만든 뒤 music_tools.py analyze 로 히트를 읽는다.
 """
+import _utf8  # noqa: F401  (Windows 에서 UTF-8 모드로 다시 실행)
 import json
 import subprocess
 import sys

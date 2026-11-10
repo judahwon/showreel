@@ -4,6 +4,7 @@
 사용법: preflight.py [--voice ibCGc01503OQd2R6i1n1] [--json]
 결과의 '쓸 수 있는 경로'를 콘셉트에 반영한다(예: 나레이션 불가 → 음악·화면만으로 전하는 콘셉트, Music 불가 → 합성 음악).
 """
+import _utf8  # noqa: F401  (Windows 에서 UTF-8 모드로 다시 실행)
 import argparse
 import json
 import os
@@ -17,8 +18,21 @@ SKILLS = Path.home() / ".claude" / "skills"
 REPO = "https://github.com/revfactory/skills"
 
 
+WINDOWS = os.name == "nt"
+
+
+def find_chrome():
+    if os.environ.get("REEL_CHROME_PATH"):
+        return True
+    if Path("/Applications/Google Chrome.app").exists() or shutil.which("google-chrome") or shutil.which("chrome"):
+        return True
+    roots = [os.environ.get(k) for k in ("PROGRAMFILES", "PROGRAMFILES(X86)", "LOCALAPPDATA")]
+    return any(Path(r, "Google", "Chrome", "Application", "chrome.exe").exists() for r in roots if r)
+
+
 def run(cmd, timeout=20):
     try:
+        cmd = [shutil.which(cmd[0]) or cmd[0], *cmd[1:]]   # Windows 의 npm·codex 는 .cmd 라 경로를 찾아 넘긴다
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
         return r.returncode, (r.stdout + r.stderr).strip()
     except Exception as e:
@@ -39,12 +53,12 @@ def main():
 
     # 필수 도구
     code, out = run(["node", "--version"])
-    row("node", code == 0, out.splitlines()[0] if code == 0 else "없음", "https://nodejs.org 에서 LTS 설치 또는 brew install node")
+    row("node", code == 0, out.splitlines()[0] if code == 0 else "없음", "https://nodejs.org 에서 LTS 설치" + ("" if WINDOWS else " 또는 brew install node"))
     code, out = run(["ffmpeg", "-hide_banner", "-filters"])
     has_ff = code == 0
     flt = {f: (f" {f} " in out) for f in ("loudnorm", "ebur128", "tmix", "freezedetect", "signalstats")}
-    row("ffmpeg", has_ff and all(flt.values()), "필터 " + ", ".join(k for k, v in flt.items() if v) if has_ff else "없음", "brew install ffmpeg")
-    chrome = Path("/Applications/Google Chrome.app").exists() or bool(shutil.which("google-chrome")) or bool(os.environ.get("REEL_CHROME_PATH"))
+    row("ffmpeg", has_ff and all(flt.values()), "필터 " + ", ".join(k for k, v in flt.items() if v) if has_ff else "없음", "winget install Gyan.FFmpeg" if WINDOWS else "brew install ffmpeg")
+    chrome = find_chrome()
     row("Chrome", chrome, "시스템 Chrome 사용" if chrome else "없음", "Google Chrome 설치 또는 REEL_CHROME_PATH=<chromium 실행 파일>")
     pw = (HERE / "node_modules" / "playwright-core").exists()
     row("playwright-core", pw, "설치됨" if pw else "없음", f"cd {HERE} && npm install (new_project.py 가 자동으로 한다)")
@@ -54,10 +68,15 @@ def main():
         row("python numpy·Pillow", True, f"python {sys.version.split()[0]}")
     except ImportError as e:
         row("python numpy·Pillow", False, str(e), f"{sys.executable} -m pip install numpy pillow")
-    fonts = [p for d in (Path.home() / "Library/Fonts", Path("/Library/Fonts")) if d.exists() for p in d.glob("Pretendard*")]
+    font_dirs = (Path.home() / "Library/Fonts", Path("/Library/Fonts"), Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts", Path(os.environ.get("LOCALAPPDATA", ".")) / "Microsoft/Windows/Fonts")
+    fonts = [p for d in font_dirs if d.exists() for p in d.glob("Pretendard*")]
     row("한글 폰트(Pretendard)", True, "로컬 있음" if fonts else "없음 → new_project.py 가 내려받음")
     swift = bool(shutil.which("swiftc"))
-    row("누끼(swiftc, macOS)", swift, "가능" if swift else "불가 — 인물 누끼 없이 진행", "xcode-select --install")
+    # 누끼는 macOS 전용 선택 기능이라 다른 OS 에서는 고칠 것으로 치지 않는다
+    if sys.platform == "darwin":
+        row("누끼(swiftc, macOS)", swift, "가능" if swift else "불가 — 인물 누끼 없이 진행", "xcode-select --install")
+    else:
+        rows.append(("–", "누끼(swiftc, macOS)", "macOS 전용 — 인물 누끼 없이 진행"))
 
     # 이미지 생성
     code, out = run(["codex", "login", "status"])
@@ -66,7 +85,7 @@ def main():
         "npm i -g @openai/codex && codex login (ChatGPT 계정)")
     for sk in ("codex-image", "photoreal", "codex-cli"):
         row(f"스킬 {sk}", (SKILLS / sk / "SKILL.md").exists(), "설치됨" if (SKILLS / sk / "SKILL.md").exists() else "없음",
-            f"git clone {REPO}.git ~/src/revfactory-skills && ln -s ~/src/revfactory-skills/{sk} ~/.claude/skills/{sk}")
+            f"git clone {REPO}.git ~/src/revfactory-skills 후 {sk} 폴더를 ~/.claude/skills/{sk} 로 복사" if WINDOWS else f"git clone {REPO}.git ~/src/revfactory-skills && ln -s ~/src/revfactory-skills/{sk} ~/.claude/skills/{sk}")
     caps["image_gen"] = codex_ok and (SKILLS / "codex-image").exists()
 
     # ElevenLabs

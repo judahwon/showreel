@@ -14,6 +14,7 @@
 - --fonts: 기본 세트 밖의 Google Fonts 서체(모두 OFL)를 더한다. 굵기는 범위(100..900)가 아니라 ;로 나열한다.
   지정한 서체는 reel/fonts/.extra_fonts 에 남아 다시 실행해도 유지된다.
 """
+import _utf8  # noqa: F401  (Windows 에서 UTF-8 모드로 다시 실행)
 import argparse
 import json
 import os
@@ -34,7 +35,8 @@ const { ease, prog, win, kf, spring, clamp, lerp, rand, noise, split, stagger, c
 REEL.config({ duration: %(dur)s, fps: %(fps)s, width: %(w)s, height: %(h)s, audio: null });   // 미리보기에서 소리를 들으려면 audio: '../audio/mix.wav'
 """
 
-LOCAL_DIRS = [Path.home() / "Library/Fonts", Path("/Library/Fonts"), Path.home() / ".local/share/fonts", Path("/usr/share/fonts")]
+LOCAL_DIRS = [Path.home() / "Library/Fonts", Path("/Library/Fonts"), Path.home() / ".local/share/fonts", Path("/usr/share/fonts"),
+              Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts", Path(os.environ.get("LOCALAPPDATA", ".")) / "Microsoft/Windows/Fonts"]
 PRETENDARD_URL = "https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/woff2/PretendardVariable.woff2"
 GOOGLE_CSS = ("https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&family=Black+Han+Sans"
               "&family=Anton&family=JetBrains+Mono:wght@400;500;700&display=block")
@@ -162,7 +164,7 @@ def setup_fonts(fdir: Path, extra=()):
 def ensure_node_deps():
     if (SCRIPTS / "node_modules" / "playwright-core").exists():
         return "playwright-core: 있음"
-    r = subprocess.run(["npm", "install", "--no-audit", "--no-fund", "--silent"], cwd=SCRIPTS, capture_output=True, text=True)
+    r = subprocess.run([shutil.which("npm") or "npm", "install", "--no-audit", "--no-fund", "--silent"], cwd=SCRIPTS, capture_output=True, text=True)
     if r.returncode != 0:
         return "playwright-core: 설치 실패 — `cd %s && npm install` 을 직접 실행할 것\n%s" % (SCRIPTS, r.stderr[-400:])
     return "playwright-core: 설치함"
